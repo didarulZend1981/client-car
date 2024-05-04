@@ -8,9 +8,9 @@ const Banner = () => {
   return (
     <div className="carousel w-full">
   <div id="slide1" className="carousel-item relative w-full h-[600px]">
-    <img src={img6} className="w-full" />
+    <img src={img6} className="w-full rounded-lg" />
     
-    <div className="absolute flex items-center h-full left-0 top-0 bg-gradient-to-r from-[#151515] to-[rgba(21,21,21,0)]">
+    <div className="absolute rounded-lg flex items-center h-full left-0 top-0 bg-gradient-to-r from-[#151515] to-[rgba(21,21,21,0)]">
       <div className='text-white space-y-7 pl-12 w-1/2'>
             <h2 className="text-6xl font-blod">Affordable Price For Car Serviceing</h2>
             <p>There are many variation of passges of available, but the majority have suffered alteration in some form</p>
@@ -29,9 +29,9 @@ const Banner = () => {
     </div>
   </div> 
   <div id="slide2" className="carousel-item relative w-full h-[600px]">
-    <img src={img1} className="w-full" />
+    <img src={img1} className="w-full rounded-lg" />
 
-    <div className="absolute flex items-center h-full left-0 top-0 bg-gradient-to-r from-[#151515] to-[rgba(21,21,21,0)] bottom-">
+    <div className="absolute rounded-lg flex items-center h-full left-0 top-0 bg-gradient-to-r from-[#151515] to-[rgba(21,21,21,0)] bottom-">
       <div className='text-white space-y-7 pl-12 w-1/2'>
             <h2 className="text-6xl font-blod">Affordable Price For Car Serviceing</h2>
             <p>There are many variation of passges of available, but the majority have suffered alteration in some form</p>
@@ -49,8 +49,8 @@ const Banner = () => {
     </div>
   </div> 
   <div id="slide3" className="carousel-item relative w-full h-[600px]">
-    <img src={img3} className="w-full" />
-    <div className="absolute flex items-center h-full left-0 top-0 bg-gradient-to-r from-[#151515] to-[rgba(21,21,21,0)]">
+    <img src={img3} className="w-full rounded-lg" />
+    <div className="absolute rounded-lg flex items-center h-full left-0 top-0 bg-gradient-to-r from-[#151515] to-[rgba(21,21,21,0)]">
       <div className='text-white space-y-7 pl-12 w-1/2'>
             <h2 className="text-6xl font-blod">Affordable Price For Car Serviceing</h2>
             <p>There are many variation of passges of available, but the majority have suffered alteration in some form</p>
