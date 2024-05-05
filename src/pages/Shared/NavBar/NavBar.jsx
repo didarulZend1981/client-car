@@ -1,11 +1,23 @@
 import { Link } from 'react-router-dom';
 import logo from '../../../assets/logo.svg'
+import UseAuthHook from '../../../providers/UseAuthHook';
 
 const NavBar = () => {
+  const {user,logOut} = UseAuthHook();
+  
   const navItems =<>
         <li><Link to="/">Home</Link></li>
         <li><Link to="/about">About</Link></li>
-        <li><Link to="/login">login</Link></li>
+        {!user && (
+            <>
+            <li>
+              <Link to='/login'>Login</Link>
+            </li>
+             <li><Link to="/signup">Sign Up</Link></li>
+             </>
+          )}
+       
+       
       </>
 
   return (
@@ -28,6 +40,41 @@ const NavBar = () => {
     </div>
     <div className="navbar-end">
       <a className="btn btn-outline btn-warning">Appointment</a>
+
+
+
+      {user && (
+          <div className='dropdown dropdown-end z-50'>
+            <div
+              tabIndex={0}
+              role='button'
+              className='btn btn-ghost btn-circle avatar'
+            >
+              <div title={user?.displayName} className='w-10 rounded-full'>
+                <img
+                  referrerPolicy='no-referrer'
+                  alt='User Profile Photo'
+                  src={user?.photoURL}
+                />
+              </div>
+              
+            </div>
+            <ul
+              tabIndex={0}
+              className='menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52'
+            >
+             
+              <li className='mt-2'>
+                <button
+                  onClick={logOut}
+                  className='bg-gray-200 block text-center'
+                >
+                  Logout
+                </button>
+              </li>
+            </ul>
+          </div>
+        )}
     </div>
   </div>
   );

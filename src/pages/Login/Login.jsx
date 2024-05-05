@@ -1,10 +1,10 @@
 
 import login from '../../assets/images/login/login.svg'
-import UseAuthHook from '../../providers/UseAuthHook';
+
 
 
 const Login = () => {
-  const {test} = UseAuthHook();
+  
   return (
     <div className="hero min-h-screen bg-base-200">
   <div className="hero-content flex-col lg:flex-row">
@@ -13,7 +13,7 @@ const Login = () => {
     </div>
     <div className="card flex-shrink-0 w-1/2 max-w-sm shadow-2xl bg-base-100">
       <form className="card-body">
-        <h1 className="text-center text-3xl font-bold ">Login-{test}</h1>
+        <h1 className="text-center text-3xl font-bold ">Login</h1>
         <div className="form-control">
 
           <label className="label">
