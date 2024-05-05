@@ -143,4 +143,60 @@ Currently, two official plugins are available:
                 </div>
                 </div>
                 );
-                };
+        };
+
+### context API follow 3 step
+    1.step providers/AuthProviders.jsx
+            import { createContext } from "react";
+
+            export const AuthContext = createContext();
+            const AuthProviders = ({children}) => {
+                    const test = "didar";
+                    const authInfo ={
+                        test,
+                    }
+                    
+                    return (
+                        <AuthContext.Provider value={authInfo}>
+                        {children}
+                        </AuthContext.Provider>
+                    );
+            };
+
+            export default AuthProviders;
+    2.step main.jsx
+            import AuthProviders from './providers/AuthProviders';
+            ReactDOM.createRoot(document.getElementById('root')).render(
+                    <div className='max-w-7xl mx-auto'>
+                        <React.StrictMode>
+                            <AuthProviders>
+                            <RouterProvider router={router} />
+                            </AuthProviders>
+                            
+                        </React.StrictMode>
+                    </div>
+                
+                )
+    3B.using auth context--
+        import { useContext } from "react";
+        import { AuthContext } from "./AuthProviders";
+        const {test} = useContext(AuthContext);
+
+    or better option
+    create hook like this
+        providers/UseAuthHook.jsx
+            import { useContext } from "react";
+            import { AuthContext } from "./AuthProviders";
+
+
+                    const UseAuthHook = () => {
+                    const all = useContext(AuthContext);
+                    return all;
+                    };
+
+            export default UseAuthHook;
+    3a.using auth context--
+         import UseAuthHook from '../../providers/UseAuthHook';
+         const {test} = UseAuthHook();
+
+
