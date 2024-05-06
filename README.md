@@ -330,3 +330,116 @@ Currently, two official plugins are available:
                 </React.StrictMode>
             </div>
 
+
+
+### Login--
+    1st step-
+        AuthProviders.jsx
+
+        const signIn = (email, password) => {
+          return signInWithEmailAndPassword(auth, email, password);
+        }
+        const authInfo ={
+            signIn
+        }
+
+    2.login.jsx
+        const Login = () => {
+            const {signIn} = UseAuthHook();
+            const location = useLocation();
+            const navigate = useNavigate();
+            const handleLogin = e => {
+                e.preventDefault();
+                
+                // console.log(e.currentTarget);
+                const form = new FormData(e.currentTarget);
+                const email = form.get('email');
+                const password = form.get('password');
+            // console.log(email,password);
+            signIn(email, password)
+            .then(result => {
+                console.log("login tyme",result.user.displayName);
+                navigate(location?.state?location.state:'/');
+                toast.success("Signin Successful {result.user.displayName}")
+            })
+            .catch(error => {
+                toast.error('your email and password should match with the registered email and password If it doesnt match')
+                    
+            })
+
+
+        }
+
+        form:-
+        <form onSubmit={handleLogin} className="card-body">
+            <h1 className="text-center text-3xl font-bold ">Login</h1>
+            <div className="form-control">
+
+            <label className="label">
+                <span className="label-text">Email</span>
+            </label>
+            <input type="email" name="email" placeholder="email" className="input input-bordered" required />
+            </div>
+            <div className="form-control">
+            <label className="label">
+                <span className="label-text">Password</span>
+            </label>
+            <input type="password" name="password" placeholder="password" className="input input-bordered" required />
+            
+            </div>
+            <div className="form-control mt-6">
+            <button className="btn btn-primary">Login</button>
+            </div>
+        </form>
+
+### Social Network login
+    AuthProviders.jsx
+      const googleProvider = new GoogleAuthProvider();
+      // -------------------
+      const googleLogin =() =>{
+        setLoading(true)
+        return signInWithPopup(auth, googleProvider);
+      }
+
+      const authInfo ={
+            googleLogin,
+        }
+
+    socialLogin.jsx
+            import React from 'react';
+
+            import { useLocation, useNavigate } from "react-router-dom";
+            import { FaGooglePlusG } from "react-icons/fa";
+
+            import UseAuthHook from '../../providers/UseAuthHook';
+            import toast from 'react-hot-toast';
+            const SocialLogin = () => {
+            const {googleLogin} =UseAuthHook();
+
+            const navigate = useNavigate();
+            const location = useLocation();
+            const from = location?.state || "/";
+            const handleSocialLogin = socialProvider =>{
+
+            socialProvider().then(result=>{
+            if(result.user){
+            // toast.success('successfully login')
+            navigate(from);
+            toast.success('successfully login')
+
+            }
+            })
+            }
+
+
+            return (
+            <div>
+            <div className="w-1/3 mx-auto grid grid-cols-2 gap-4 mt-5 my-auto min-h-max text-center mb-3 border-t-2 pt-5">
+            <button onClick={()=>handleSocialLogin(googleLogin)} className="btn btn-outline btn-primary"><FaGooglePlusG className='text-[red]'/> Google</button>
+
+            </div>
+            </div>
+            );
+            };
+
+            export default SocialLogin;
