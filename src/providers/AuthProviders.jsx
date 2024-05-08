@@ -37,7 +37,8 @@ const AuthProviders = ({children}) => {
   }
 
   const logOut = () => {
-    setUser(null);
+   setUser(null);
+    // setLoading(true)
     // setLoading(false);
     return signOut(auth);
   
@@ -46,8 +47,9 @@ const AuthProviders = ({children}) => {
 
    useEffect(() => {
         const unSubscribe = onAuthStateChanged(auth, currentUser => {
-            console.log('user in the auth state changed', currentUser);
             setUser(currentUser);
+            console.log('user in the auth state changed', currentUser);
+            
             setLoading(false);
          
           
@@ -59,7 +61,7 @@ const AuthProviders = ({children}) => {
 
     //SignIn
     const signIn = (email, password) => {
-      
+      setLoading(true)
       return signInWithEmailAndPassword(auth, email, password);
      }
 

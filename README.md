@@ -443,3 +443,302 @@ Currently, two official plugins are available:
             };
 
             export default SocialLogin;
+
+
+### BookService--
+    Home/Services/ServiceCard.jsx
+        <Link to={`../book/${_id}`}>
+                <button className="btn btn-primary">Buy Now</button>
+        </Link>
+    Routes.jsx
+        {
+            path: '/book/:id',
+            element:<BookServics></BookServics>,
+            loader: ({params}) => fetch(`http://localhost:5000/services/${params.id}`)
+        }
+
+    BookServics.jsx
+            import { useLoaderData } from "react-router-dom";
+            import UseAuthHook from "../../providers/UseAuthHook";
+            const BookServics = () => {
+            const service = useLoaderData();
+                const { title, _id, price, img } = service;
+                const {user} = UseAuthHook();
+
+                const handleBookService = event =>{
+                        event.preventDefault();
+
+                        const form = event.target;
+                        const name = form.name.value;
+                        const date = form.date.value;
+                        const email = user?.email;
+                        const booking = {
+                            customerName: name, 
+                            email, 
+                            img,
+                            date, 
+                            service: title,
+                            service_id: _id, 
+                            price: price
+                        }
+
+                        console.log(booking);
+
+                        fetch('http://localhost:5000/bookings', {
+                            method: 'POST', 
+                            headers: {
+                                'content-type': 'application/json'
+                            }, 
+                            body: JSON.stringify(booking)
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log(data);
+                            if(data.insertedId){
+                                alert('service book successfully')
+                            }
+                        })
+
+                    
+
+                
+
+                }
+                return (
+                
+
+
+                    <div>
+                    <h2 className='text-center text-3xl'>Book Service: {title} </h2>
+                            <form onSubmit={handleBookService}>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="form-control">
+                                        <label className="label">
+                                            <span className="label-text">Name</span>
+                                        </label>
+                                        <input type="text" defaultValue={user?.displayName} name="name" className="input input-bordered" />
+                                    </div>
+                                    <div className="form-control">
+                                        <label className="label">
+                                            <span className="label-text">Date</span>
+                                        </label>
+                                        <input type="date" name="date" className="input input-bordered" />
+                                    </div>
+                                    <div className="form-control">
+                                        <label className="label">
+                                            <span className="label-text">Email</span>
+                                        </label>
+                                        <input type="text" name="email" defaultValue={user?.email} placeholder="email" className="input input-bordered" />
+                                    </div>
+                                    <div className="form-control">
+                                        <label className="label">
+                                            <span className="label-text">Due amount</span>
+                                        </label>
+                                        <input type="text" defaultValue={'$'+ price} className="input input-bordered" />
+                                    </div>
+                                </div>
+                                <div className="form-control mt-6">
+                                    <input className="btn btn-primary btn-block" type="submit" value="Order Confirm" />
+                                </div>
+                            </form>
+                            <div className="card-body">
+
+                            </div>
+                    </div>
+                    );
+                };
+
+             export default BookServics;
+
+### BOOKING
+    
+        import { useEffect, useState } from "react";
+        import UseAuthHook from "../../providers/UseAuthHook";
+        const Booking = () => {
+        const { user } = UseAuthHook();
+        console.log(user);
+        
+            const [bookings, setBookings] = useState([]);
+            const url = `http://localhost:5000/bookings?email=${user?.email}`;
+            useEffect(() => {
+                fetch(url)
+                    .then(res => res.json())
+                    .then(data => setBookings(data))
+            }, [url]);
+
+        
+        return (
+            <div>
+                <h2 className="text-5xl">Your bookings:{bookings.length}</h2>
+                    <div className="overflow-x-auto w-full">
+                        <table className="table w-full">
+                            {/* head */}
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label>
+                                            <input type="checkbox" className="checkbox" />
+                                        </label>
+                                    </th>
+                                    <th>Image</th>
+                                    <th>Service</th>
+                                    <th>Date</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                 {
+                                    bookings.map(booking => <BookingRow
+                                        key={booking._id}
+                                        booking={booking}
+                                        handleDelete={handleDelete}
+                                        handleBookingConfirm={handleBookingConfirm}
+                                    ></BookingRow>)
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+            </div>
+        );
+        };
+
+        export default Booking;
+
+
+
+### BOOKING DELETE
+    booking.jsx
+    const handleDelete = id => {
+      const proceed = confirm('Are You sure you want to delete');
+                if (proceed) {
+                    fetch(`http://localhost:5000/bookings/${id}`, {
+                        method: 'DELETE'
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log(data);
+                            if (data.deletedCount > 0) {
+                                alert('deleted successful');
+                                const remaining = bookings.filter(booking => booking._id !== id);
+                                setBookings(remaining);
+                            }
+                        })
+                }
+      }
+
+  #####  booking table
+            <tbody>
+                    {
+                            bookings.map(booking => <BookingRow
+                                key={booking._id}
+                                booking={booking}
+                                handleDelete={handleDelete}
+                                
+                            ></BookingRow>)
+                    }
+            </tbody>
+    ##### BookingRow
+          const BookingRow = ({ booking, handleDelete }) => {
+            const { _id, date, service, price, img, status } = booking;
+
+            return (
+                <tr>
+                    <th>
+                        <button onClick={() => handleDelete(_id)} className="btn btn-sm btn-circle">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </th>
+                    <td>
+                        <div className="avatar">
+                            <div className="rounded w-24 h-24">
+                                {img && <img src={img} alt="Avatar Tailwind CSS Component" />}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {service}
+                    </td>
+                    <td>{date}</td>
+                    <td>${price}</td>
+                    <th>
+                        
+                    </th>
+                </tr>
+                );
+    };
+
+    export default BookingRow;       
+
+
+###### update (booking extra line)
+
+         const handleBookingConfirm = id => {
+            fetch(`http://localhost:5000/bookings/${id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: 'confirm' })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log(data);
+                            if (data.modifiedCount > 0) {
+                                // update state
+                                const remaining = bookings.filter(booking => booking._id !== id);
+                                const updated = bookings.find(booking => booking._id === id);
+                                updated.status = 'confirm'
+                                const newBookings = [updated, ...remaining];
+                                setBookings(newBookings);
+                            }
+                        })
+                }
+#####  booking table
+            <tbody>
+                    {
+                            bookings.map(booking => 
+                            <BookingRow
+                                key={booking._id}
+                                booking={booking}
+                                handleDelete={handleDelete}
+                                handleBookingConfirm={handleBookingConfirm}   
+                            >
+                            </BookingRow>)
+                    }
+            </tbody>
+#####  booking table
+        const BookingRow = ({ booking, handleDelete, handleBookingConfirm }) => {
+        const { _id, date, service, price, img, status } = booking;
+
+            return (
+                <tr>
+                    <th>
+                        <button onClick={() => handleDelete(_id)} className="btn btn-sm btn-circle">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </th>
+                    <td>
+                        <div className="avatar">
+                            <div className="rounded w-24 h-24">
+                                {img && <img src={img} alt="Avatar Tailwind CSS Component" />}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {service}
+                    </td>
+                    <td>{date}</td>
+                    <td>${price}</td>
+                    <th>
+                        {
+                            status === 'confirm' ? <span className="font-bold text-primary">Confirmed</span> :
+                                <button onClick={() => handleBookingConfirm(_id)} className="btn btn-ghost btn-xs">Please Confirm</button>}
+                    </th>
+                </tr>
+            );
+            };
+
+            export default BookingRow;
+    
