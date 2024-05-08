@@ -1,10 +1,11 @@
 
 
 import { Navigate, useLocation } from 'react-router';
-import UseAuthHook from '../providers/UseAuthHook';
+import useAuthHook from '../providers/useAuthHook';
 
 const PrivateRoute = ({children}) => {
-    const {user, loading} = UseAuthHook();
+    const {user, loading} = useAuthHook();
+    // console.log(user);
     const location = useLocation();
     // console.log(location.pathname);
 
@@ -13,6 +14,7 @@ const PrivateRoute = ({children}) => {
     }
 
     if(user?.email){
+        // console.log('login test')
         return children;
     }
 

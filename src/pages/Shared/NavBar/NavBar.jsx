@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import logo from '../../../assets/logo.svg'
-import UseAuthHook from '../../../providers/UseAuthHook';
+import useAuthHook from '../../../providers/useAuthHook';
 
 const NavBar = () => {
-  const {user,logOut} = UseAuthHook();
+  const {user,logOut} = useAuthHook();
   
   
   const navItems =<>

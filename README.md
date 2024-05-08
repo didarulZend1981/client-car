@@ -184,20 +184,20 @@ Currently, two official plugins are available:
 
     or better option
     create hook like this
-        providers/UseAuthHook.jsx
+        providers/useAuthHook.jsx
             import { useContext } from "react";
             import { AuthContext } from "./AuthProviders";
 
 
-                    const UseAuthHook = () => {
+                    const useAuthHook = () => {
                     const all = useContext(AuthContext);
                     return all;
                     };
 
-            export default UseAuthHook;
+            export default useAuthHook;
     3a.using auth context--
-         import UseAuthHook from '../../providers/UseAuthHook';
-         const {test} = UseAuthHook();
+         import useAuthHook from '../../providers/useAuthHook';
+         const {test} = useAuthHook();
 
 ### Firebase 
     npm install firebase
@@ -211,61 +211,92 @@ Currently, two official plugins are available:
     export const AuthContext = createContext();
         const AuthProviders = ({children}) => {
          const [user,setUser] =useState(null);
+         const [loading, setLoading] = useState(false);
         
         //create user
-        const createUser =(email, password)=>{
+        const createUser = (email, password) => {
+            setLoading(true);
             return createUserWithEmailAndPassword(auth, email, password);
-        
-        }
+        };
+
+        //GitHub
+
         const updateUserProfile = (name, photo) => {
-                return updateProfile(auth.currentUser, {
-                        displayName: name,
-                        photoURL: photo,
-                })
-        }
+            return updateProfile(auth.currentUser, {
+            displayName: name,
+            photoURL: photo,
+            });
+        };
+        const logOut = () => {
+        // setUser(null);
+        // setLoading(true)
+        // setLoading(false);
+        return signOut(auth);
+        };
+
+        useEffect(() => {
+            const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
+                setUser(currentUser);
+                console.log("user in the auth state changed", currentUser);
+
+                setLoading(false);
+            });
+            return () => {
+                    return unSubscribe();
+            };
+        }, []);
+
 
         const authInfo ={
             user,
             setUser,
             createUser,
-            updateUserProfile
+            updateUserProfile,
+            loading,
+            setLoading
+            
         }
         
        
     SignUp.jsx
         import { Link, useLocation, useNavigate } from "react-router-dom";
         import img from '../../assets/images/login/login.svg'
-        import UseAuthHook from "../../providers/UseAuthHook";
+        import useAuthHook from "../../providers/useAuthHook";
         import toast from "react-hot-toast";
 
         const SignUp = () => {
-        const {createUser,user,setUser,updateUserProfile} = UseAuthHook();
-        const navigate = useNavigate();
-        const location = useLocation();
-        const from = location?.state || "/";
-        const handleSignUp = async e => {
+            const {createUser,user,setUser,updateUserProfile,setLoading} = useAuthHook();
+            const navigate = useNavigate();
+            const location = useLocation();
+            const from = location?.state || "/";
+
+            const handleSignUp = async e => {
             e.preventDefault()
             const form = e.target
             const email = form.email.value
             const name = form.name.value
             const photo = form.photo.value
             const pass = form.password.value
+            if(pass.lenth<6){
+            toast.success('pass 6')
+            }
             console.log({ email, pass, name, photo })
             try {
             //2. User Registration
             const result = await createUser(email, pass)
             // console.log(result)
             await updateUserProfile(name, photo)
-            // setUser({ ...user, photoURL: photo, displayName: name })
+            setUser({ ...user, photoURL: photo, displayName: name })
+            setLoading(false);
             navigate(from);
             toast.success('Signup Successful')
-            setUser({ ...user, photoURL: photo, displayName: name })
+            //   setUser({ ...user, photoURL: photo, displayName: name })
             } catch (err) {
             // console.log(pass);
             // console.log(err)
             toast.error(err?.message)
             }
-        }
+            }
         return (
             <div className="hero min-h-screen bg-base-200">
                     <div className="hero-content flex-col lg:flex-row">
@@ -337,6 +368,7 @@ Currently, two official plugins are available:
         AuthProviders.jsx
 
         const signIn = (email, password) => {
+          setLoading(true);
           return signInWithEmailAndPassword(auth, email, password);
         }
         const authInfo ={
@@ -345,30 +377,36 @@ Currently, two official plugins are available:
 
     2.login.jsx
         const Login = () => {
-            const {signIn} = UseAuthHook();
+            const {signIn,setLoading} = useAuthHook();
             const location = useLocation();
             const navigate = useNavigate();
             const handleLogin = e => {
-                e.preventDefault();
-                
-                // console.log(e.currentTarget);
-                const form = new FormData(e.currentTarget);
-                const email = form.get('email');
-                const password = form.get('password');
+            e.preventDefault();
+
+            // console.log(e.currentTarget);
+            const form = new FormData(e.currentTarget);
+            const email = form.get('email');
+            const password = form.get('password');
             // console.log(email,password);
             signIn(email, password)
             .then(result => {
-                console.log("login tyme",result.user.displayName);
-                navigate(location?.state?location.state:'/');
-                toast.success("Signin Successful {result.user.displayName}")
+            console.log("login tyme",result.user.displayName);
+            setLoading(false);
+            navigate(location?.state?location.state:'/');
+
+            toast.success("Signin Successful {result.user.displayName}")
             })
             .catch(error => {
-                toast.error('your email and password should match with the registered email and password If it doesnt match')
-                    
+            toast.error('your email and password should match with the registered email and password If it doesnt match')
+
             })
 
 
-        }
+
+
+
+
+            }
 
         form:-
         <form onSubmit={handleLogin} className="card-body">
@@ -394,55 +432,59 @@ Currently, two official plugins are available:
 
 ### Social Network login
     AuthProviders.jsx
-      const googleProvider = new GoogleAuthProvider();
-      // -------------------
-      const googleLogin =() =>{
-        setLoading(true)
-        return signInWithPopup(auth, googleProvider);
-      }
+       //  social provider
+        const googleProvider = new GoogleAuthProvider();
+        // -------------------
+        const googleLogin = () => {
+            setLoading(true);
+            return signInWithPopup(auth, googleProvider);
+        };
 
       const authInfo ={
             googleLogin,
         }
 
     socialLogin.jsx
-            import React from 'react';
+        import React from 'react';
 
-            import { useLocation, useNavigate } from "react-router-dom";
-            import { FaGooglePlusG } from "react-icons/fa";
+        import { useLocation, useNavigate } from "react-router-dom";
+        import { FaGooglePlusG } from "react-icons/fa";
 
-            import UseAuthHook from '../../providers/UseAuthHook';
-            import toast from 'react-hot-toast';
-            const SocialLogin = () => {
-            const {googleLogin} =UseAuthHook();
+        import useAuthHook from '../../providers/useAuthHook';
+        import toast from 'react-hot-toast';
+        const SocialLogin = () => {
+        const {googleLogin,setLoading} =useAuthHook();
 
-            const navigate = useNavigate();
-            const location = useLocation();
-            const from = location?.state || "/";
-            const handleSocialLogin = socialProvider =>{
+        const navigate = useNavigate();
+        const location = useLocation();
+        const from = location?.state || "/";
+        // const from = location.state?.from?.pathname || "/";
 
-            socialProvider().then(result=>{
-            if(result.user){
-            // toast.success('successfully login')
-            navigate(from);
-            toast.success('successfully login')
+        const handleSocialLogin = socialProvider =>{
 
-            }
-            })
-            }
+        socialProvider().then(result=>{
+        if(result.user){
+        setLoading(false);
+        // toast.success('successfully login')
+        navigate(from);
+        toast.success('successfully login')
+
+        }
+        })
+        }
 
 
-            return (
-            <div>
-            <div className="w-1/3 mx-auto grid grid-cols-2 gap-4 mt-5 my-auto min-h-max text-center mb-3 border-t-2 pt-5">
-            <button onClick={()=>handleSocialLogin(googleLogin)} className="btn btn-outline btn-primary"><FaGooglePlusG className='text-[red]'/> Google</button>
+        return (
+        <div>
+        <div className="w-1/3 mx-auto grid grid-cols-2 gap-4 mt-5 my-auto min-h-max text-center mb-3 border-t-2 pt-5">
+        <button onClick={()=>handleSocialLogin(googleLogin)} className="btn btn-outline btn-primary"><FaGooglePlusG className='text-[red]'/> Google</button>
 
-            </div>
-            </div>
-            );
-            };
+        </div>
+        </div>
+        );
+        };
 
-            export default SocialLogin;
+        export default SocialLogin;
 
 
 ### BookService--
@@ -459,11 +501,11 @@ Currently, two official plugins are available:
 
     BookServics.jsx
             import { useLoaderData } from "react-router-dom";
-            import UseAuthHook from "../../providers/UseAuthHook";
+            import useAuthHook from "../../providers/useAuthHook";
             const BookServics = () => {
             const service = useLoaderData();
                 const { title, _id, price, img } = service;
-                const {user} = UseAuthHook();
+                const {user} = useAuthHook();
 
                 const handleBookService = event =>{
                         event.preventDefault();
@@ -553,9 +595,9 @@ Currently, two official plugins are available:
 ### BOOKING
     
         import { useEffect, useState } from "react";
-        import UseAuthHook from "../../providers/UseAuthHook";
+        import useAuthHook from "../../providers/useAuthHook";
         const Booking = () => {
-        const { user } = UseAuthHook();
+        const { user } = useAuthHook();
         console.log(user);
         
             const [bookings, setBookings] = useState([]);
@@ -745,10 +787,10 @@ Currently, two official plugins are available:
 #### PrivateRoute
 
         import { Navigate, useLocation } from 'react-router';
-        import UseAuthHook from '../providers/UseAuthHook';
+        import useAuthHook from '../providers/useAuthHook';
 
         const PrivateRoute = ({children}) => {
-            const {user, loading} = UseAuthHook();
+            const {user, loading} = useAuthHook();
             const location = useLocation();
             // console.log(location.pathname);
 

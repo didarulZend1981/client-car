@@ -1,9 +1,9 @@
 
 import { useEffect, useState } from "react";
-import UseAuthHook from "../../providers/UseAuthHook";
+import useAuthHook from "../../providers/useAuthHook";
 import BookingRow from "./BookingRow";
 const Booking = () => {
-  const { user } = UseAuthHook();
+  const { user } = useAuthHook();
   // console.log(user);
   
     const [bookings, setBookings] = useState([]);

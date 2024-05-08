@@ -3,21 +3,23 @@ import React from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaGooglePlusG } from "react-icons/fa";
 
-import UseAuthHook from '../../providers/UseAuthHook';
+import useAuthHook from '../../providers/useAuthHook';
 import toast from 'react-hot-toast';
 const SocialLogin = () => {
-  const {googleLogin} =UseAuthHook();
+  const {googleLogin,setLoading} =useAuthHook();
 
   const navigate = useNavigate();
   const location = useLocation();
   const from = location?.state || "/";
+  // const from = location.state?.from?.pathname || "/";
  
   const handleSocialLogin = socialProvider =>{
 
     socialProvider().then(result=>{
         if(result.user){
+          setLoading(false);
           // toast.success('successfully login')
-          navigate(location?.state?location.state:'/');
+          navigate(from);
           toast.success('successfully login')
          
         }

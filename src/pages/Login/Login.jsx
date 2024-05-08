@@ -2,12 +2,12 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import login from '../../assets/images/login/login.svg'
 
-import UseAuthHook from "../../providers/UseAuthHook";
+import useAuthHook from "../../providers/useAuthHook";
 import toast from 'react-hot-toast';
 import SocialLogin from '../SocialLogin/SocialLogin';
 
 const Login = () => {
-  const {signIn} = UseAuthHook();
+  const {signIn,setLoading} = useAuthHook();
   const location = useLocation();
   const navigate = useNavigate();
   const handleLogin = e => {
@@ -21,7 +21,9 @@ const Login = () => {
    signIn(email, password)
    .then(result => {
       console.log("login tyme",result.user.displayName);
+      setLoading(false);
       navigate(location?.state?location.state:'/');
+      
       toast.success("Signin Successful {result.user.displayName}")
    })
    .catch(error => {

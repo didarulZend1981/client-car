@@ -1,10 +1,10 @@
 
 import { useLoaderData } from "react-router-dom";
-import UseAuthHook from "../../providers/UseAuthHook";
+import useAuthHook from "../../providers/useAuthHook";
 const BookServics = () => {
   const service = useLoaderData();
     const { title, _id, price, img } = service;
-    const {user} = UseAuthHook();
+    const {user} = useAuthHook();
 
     const handleBookService = event =>{
         event.preventDefault();
@@ -34,9 +34,11 @@ const BookServics = () => {
         })
         .then(res => res.json())
         .then(data => {
+
             console.log(data);
             if(data.insertedId){
                 alert('service book successfully')
+
             }
         })
 

@@ -1,13 +1,15 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import img from '../../assets/images/login/login.svg'
-import UseAuthHook from "../../providers/UseAuthHook";
+import useAuthHook from "../../providers/useAuthHook";
 import toast from "react-hot-toast";
 
 const SignUp = () => {
-  const {createUser,user,setUser,updateUserProfile} = UseAuthHook();
+  
+  const {createUser,user,setUser,updateUserProfile,setLoading} = useAuthHook();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location?.state || "/";
+ 
   const handleSignUp = async e => {
     e.preventDefault()
     const form = e.target
@@ -25,6 +27,7 @@ const SignUp = () => {
       // console.log(result)
       await updateUserProfile(name, photo)
       setUser({ ...user, photoURL: photo, displayName: name })
+      setLoading(false);
       navigate(from);
       toast.success('Signup Successful')
     //   setUser({ ...user, photoURL: photo, displayName: name })
