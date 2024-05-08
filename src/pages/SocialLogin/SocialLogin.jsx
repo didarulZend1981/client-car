@@ -11,12 +11,13 @@ const SocialLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location?.state || "/";
+ 
   const handleSocialLogin = socialProvider =>{
 
     socialProvider().then(result=>{
         if(result.user){
           // toast.success('successfully login')
-          navigate(from);
+          navigate(location?.state?location.state:'/');
           toast.success('successfully login')
          
         }
